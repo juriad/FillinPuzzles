@@ -10,10 +10,18 @@ propagate(Puzzle, Wordlist, [], NewPuzzle) :-
 	propagate_global_words(Puzzle, Wordlist, NewPuzzle).
 	
 propagate(Puzzle, Wordlist, [Id | Queue], NewPuzzle) :-
-	get_tile(Puzzle, Id, PTile),
-	propagate_tile(PTile, Queue, PTile2, Queue2),
-	set_tile(Puzzle, PTile2, Puzzle1),
+	puzzle_map_fold(Puzzle, propagate_func(Id), Queue, Puzzle1, Queue2),
 	propagate(Puzzle1, Wordlist, Queue2, NewPuzzle).
+	
+propagate_func(Id, PTile, Queue, PTile2, Queue2) :-
+	(
+		PTile = tile(Id, _, _, _, _)
+	->
+		propagate_tile(PTile, Queue, PTile2, Queue2)
+	;
+		PTile2 = PTile,
+		Queue2 = Queue
+	).
 	
 propagate_tile(PTile, Queue, tile(Id, Tile, Horiz3, Vert3, Letters2), Queue5) :-
 	PTile = tile(Id, Tile, Horiz, Vert, _),
