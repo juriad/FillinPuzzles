@@ -111,7 +111,7 @@ propagate_words(_, nil, Queue, nil, Queue, nil).
 propagate_words(PTile, Slot, Queue, slot(Ids, Tiles, Words2), Queue2, Letters) :-
 	PTile = tile(_, Tile, _, _, _),
 	Slot = slot(Ids, Tiles, Words),
-	filter_words(Tile, Words, Tiles, Words2, Letters),
+	filter_words(Tiles, Tile, Words, Words2, Letters),
 	propagate_handle_queue(PTile, Slot, Words2, Queue, Queue2).
 
 merge_letters(L1, L2, L) :-
@@ -139,7 +139,7 @@ propagate_letters(_, nil, _, Queue, nil, Queue).
 propagate_letters(PTile, Slot, Letters, Queue, slot(Ids, Tiles, Words2), Queue2) :-
 	PTile = tile(_, Tile, _, _, _),
 	Slot = slot(Ids, Tiles, Words),
-	filter_words_by_letters(Tile, Words, Tiles, Letters, Words2),
+	filter_words_by_letters(Tiles, Tile, Words, Letters, Words2),
 	propagate_handle_queue(PTile, Slot, Words2, Queue, Queue2).
 
 propagate_handle_queue(tile(Id, Tile, _, _, _), slot(Ids, Tiles, Words), Words2, Queue, Queue2) :-

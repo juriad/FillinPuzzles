@@ -31,7 +31,7 @@ create_puzzle(Template, Wordlist, Puzzle) :-
 %	@arg Id accumulator containing the first number to assign as Id
 %	@arg Puzzle puzzle with initialized Id and Tile
 %
-%	Iterated over rows of the template and calls create_vars_tiles,
+%	Iterates over rows of the template and calls create_vars_tiles,
 %	which does the actual job.
 create_vars([], _, []).
 create_vars([TRow | TRows], Id, [PRow | PRows]) :-
@@ -247,6 +247,6 @@ create_words_slot(Tile, Wordlist, Slot, SlotWithWords) :-
 		SlotWithWords = nil
 	;
 		Slot = slot(Ids, Tiles, _),
-		filter_words(Tile, Wordlist, Tiles, RowFiltered, _),
+		filter_words(Tiles, Tile, Wordlist, RowFiltered, _),
 		SlotWithWords = slot(Ids, Tiles, RowFiltered)
 	).
