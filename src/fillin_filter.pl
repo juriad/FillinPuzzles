@@ -36,6 +36,7 @@ filter_ids([tile(Id, _, _, _, _) | PTiles], [Id | Rest]) :-
 %	@arg Words old list of all possible words
 %	@arg FilteredWords new list of all possible words
 %	@arg Letters set of letters which could be assigned to Tile
+%	TODO tail recursion
 %
 %	Filters out all words which cannot be assigned to Tiles
 %	by trying to unify them.
@@ -71,6 +72,7 @@ filter_words(Tiles, Tile, [Word | Words], FilteredWords, Letters) :-
 %	@arg Words old list of all possible words
 %	@arg Letters set of letters which could be used in Tile
 %	@arg FilteredWords new list of all possible words
+%	TODO tail recursion
 %
 %	Filters out all words which cannot be assigned to Tiles
 %	by trying to unify them and testing

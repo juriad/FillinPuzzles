@@ -146,9 +146,9 @@ vert_slot_ctor(
 %	The predicate is parametrized by the slot constructor to enable its reuse
 %	for both, horizontal and vertical slots.
 create_slots([], _, []).
-create_slots([PRow | PRows], SlotCtor, [PRow2 | PRows2]) :-
-	create_slot(PRow, SlotCtor, [], PRow2),
-	create_slots(PRows, SlotCtor, PRows2).
+create_slots([PRow | PRows], SlotCtor, [PRowWithSlots | PRowsWithSlots]) :-
+	create_slot(PRow, SlotCtor, [], PRowWithSlots),
+	create_slots(PRows, SlotCtor, PRowsWithSlots).
 
 %!	create_slot(+PRow, +SlotCtor, Before, -PRowWithSlot)
 %
@@ -166,20 +166,24 @@ create_slots([PRow | PRows], SlotCtor, [PRow2 | PRows2]) :-
 %	On the other hand, when the tile is border, it creates a nil slot
 %	and it procedes with the next PTile passing an empty list as Before.
 create_slot([], _, _, []).
-create_slot([PTile | PTiles], SlotCtor, Before, [NewTile | PTiles2]) :-
+create_slot(
+		[PTile | PTiles], 
+		SlotCtor, 
+		Before, 
+		[PTileWithSlot | PTilesWithSlot]) :-
 	PTile = tile(_, Tile, _, _, _),
 	(
 		Tile == '#'
 	->
-		call(SlotCtor, PTile, [], NewTile),
+		call(SlotCtor, PTile, [], PTileWithSlot),
 		WithMe = []
 	;
 		append(Before, [PTile], WithMe),
 		create_slot_find_rest(PTiles, After),
 		append(WithMe, After, Word),
-		call(SlotCtor, PTile, Word, NewTile)
+		call(SlotCtor, PTile, Word, PTileWithSlot)
 	),
-	create_slot(PTiles, SlotCtor, WithMe, PTiles2).
+	create_slot(PTiles, SlotCtor, WithMe, PTilesWithSlot).
 
 %!	create_slot_find_rest(+RestOfRow, -RestOfSlot)
 %
@@ -223,9 +227,9 @@ create_words(Puzzle, Wordlist, PuzzleWithWords) :-
 create_words_func(
 		Wordlist,
 		tile(Id, Tile, Horiz, Vert, Letters),
-		tile(Id, Tile, Horiz2, Vert2, Letters)) :-
-	create_words_slot(Tile, Wordlist, Horiz, Horiz2),
-	create_words_slot(Tile, Wordlist, Vert, Vert2).
+		tile(Id, Tile, HorizWithWords, VertWithWords, Letters)) :-
+	create_words_slot(Tile, Wordlist, Horiz, HorizWithWords),
+	create_words_slot(Tile, Wordlist, Vert, VertWithWords).
 
 %!	create_words_slot(Tile, Wordlist, Slot, SlotWithWords)
 %

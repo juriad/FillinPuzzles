@@ -24,9 +24,9 @@
 %	This predicate iterates over rows of the Puzzle
 %	and passes them to puzzle_map_tiles which does the actual mapping.
 puzzle_map([], _, []).
-puzzle_map([PRow | PRows], Func, [PRow2 | PRows2]) :-
-	puzzle_map_tiles(PRow, Func, PRow2),
-	puzzle_map(PRows, Func, PRows2).
+puzzle_map([PRow | PRows], Func, [MappedPRow | MappedPRows]) :-
+	puzzle_map_tiles(PRow, Func, MappedPRow),
+	puzzle_map(PRows, Func, MappedPRows).
 
 %!	puzzle_map_tiles(+PRow, +Func, -MappedPRow)
 %
@@ -40,9 +40,9 @@ puzzle_map([PRow | PRows], Func, [PRow2 | PRows2]) :-
 %	This predicate iterates over PTiles of the PRow
 %	and calls puzzle_map_tiles which maps them.
 puzzle_map_tiles([], _, []).
-puzzle_map_tiles([PTile | PTiles], Func, [PTile2 | PTiles2]) :-
-	call(Func, PTile, PTile2),
-	puzzle_map_tiles(PTiles, Func, PTiles2).
+puzzle_map_tiles([PTile | PTiles], Func, [MappedPTile | MappedPTiles]) :-
+	call(Func, PTile, MappedPTile),
+	puzzle_map_tiles(PTiles, Func, MappedPTiles).
 
 %!	puzzle_fold(+Puzzle, +Func, +Start, -Result)
 %
@@ -95,9 +95,13 @@ puzzle_fold_tiles([PTile | PTiles], Func, Start, Result) :-
 %	This predicate iterates over PTiles of the PRow
 %	and calls puzzle_fold_tiles which folds them with intermediate results.
 puzzle_map_fold([], _, Result, [], Result).
-puzzle_map_fold([PRow | PRows], Func, Start, [PRow2 | PRows2], Result) :-
-	puzzle_map_fold_tiles(PRow, Func, Start, PRow2, Start2),
-	puzzle_map_fold(PRows, Func, Start2, PRows2, Result).
+puzzle_map_fold(
+		[PRow | PRows], 
+		Func, Start, 
+		[MappedPRow | MappedPRows], 
+		Result) :-
+	puzzle_map_fold_tiles(PRow, Func, Start, MappedPRow, Start2),
+	puzzle_map_fold(PRows, Func, Start2, MappedPRows, Result).
 
 %!	puzzle_map_fold_tiles(+PRow, +Func, +Start, -MappedPRow, -Result)
 %
@@ -113,14 +117,20 @@ puzzle_map_fold([PRow | PRows], Func, Start, [PRow2 | PRows2], Result) :-
 %	and calls puzzle_map_fold_tiles
 %	which maps them, and folds them with intermediate results.
 puzzle_map_fold_tiles([], _, Result, [], Result).
-puzzle_map_fold_tiles([PTile | PTiles], Func, Start, [PTile2 | PTiles2], Result) :-
-	call(Func, PTile, Start, PTile2, Start2),
-	puzzle_map_fold_tiles(PTiles, Func, Start2, PTiles2, Result).
+puzzle_map_fold_tiles(
+		[PTile | PTiles], 
+		Func, 
+		Start, 
+		[MappedPTile | MappedPTiles], 
+		Result) :-
+	call(Func, PTile, Start, MappedPTile, Start2),
+	puzzle_map_fold_tiles(PTiles, Func, Start2, MappedPTiles, Result).
 
 %!	puzzle_transpose(+Puzzle, -PuzzleT)
 %
 %	@arg Puzzle Puzzle to transpose
 %	@arg PuzzleT transposed Puzzle
+%	TODO tail recursion
 %
 %	Transposes the Puzzle.
 %	
