@@ -1,11 +1,16 @@
-%!	Creates an empty puzzle from a template.
-%	This module exports only one predicate.
+/**	<module> Puzzle Initialization
+
+	Creates an empty puzzle from a template.
+	This module exports only one predicate.
+	
+	@author Adam Juraszek <juriad@gmail.com>
+*/
 :- module(fillin_init, [create_puzzle/3]).
 
 :- use_module(fillin_filter).
 :- use_module(fillin_functions).
 
-%!	create_puzzle(+Template, +Wordlist, -Puzzle)
+%!	create_puzzle(+Template, +Wordlist, -Puzzle).
 %
 %	@arg Template template fo the puzzle to be transformed into a puzzle
 %	@arg Wordlist list of all possible words in the puzzle; no duplicates
@@ -25,7 +30,7 @@ create_puzzle(Template, Wordlist, Puzzle) :-
 	create_vert(PuzzleVarsWithHoriz, PuzzleVarsWithVert),
 	create_words(PuzzleVarsWithVert, Wordlist, Puzzle).
 
-%!	create_vars(+Template, +Id, -Puzzle)
+%!	create_vars(+Template, +Id, -Puzzle).
 %
 %	@arg Template template representation
 %	@arg Id accumulator containing the first number to assign as Id
@@ -39,7 +44,7 @@ create_vars([TRow | TRows], Id, [PRow | PRows]) :-
 	create_vars(TRows, NextId, PRows).
 
 
-%!	create_vars_tiles(+TRow, +Id, -PRow)
+%!	create_vars_tiles(+TRow, +Id, -PRow).
 %
 %	@arg TRow a single row of the template representation
 %	@arg Id accumulator containing the first number to assign as Id
@@ -64,7 +69,7 @@ create_vars_tiles(
 	Id2 is Id + 1,
 	create_vars_tiles(TTiles, Id2, PTiles, NextId).
 
-%!	create_horiz(+Puzzle, -PuzzleWithHoriz)
+%!	create_horiz(+Puzzle, -PuzzleWithHoriz).
 %
 %	@arg Puzzle a puzzle with uninitialized horizontal slots
 %	@arg PuzzleWithHoriz a puzzle with initialized horizontal slots
@@ -73,7 +78,7 @@ create_vars_tiles(
 create_horiz(Puzzle, PuzzleWithHoriz) :-
 	create_slots(Puzzle, horiz_slot_ctor, PuzzleWithHoriz).
 
-%!	horiz_slot_ctor(+PTile, +HorizPTiles, -PTileWithHorizSlot)
+%!	horiz_slot_ctor(+PTile, +HorizPTiles, -PTileWithHorizSlot).
 %
 %	@arg PTile ptile which does not contain horizontal slot
 %	@arg HorizPTiles list of PTiles which make up the horizontal slot
@@ -97,7 +102,7 @@ horiz_slot_ctor(
 		Slot = nil
 	).
 
-%!	create_vert(+Puzzle, -PuzzleWithHoriz)
+%!	create_vert(+Puzzle, -PuzzleWithHoriz).
 %
 %	@arg Puzzle a puzzle with uninitialized vertical slots
 %	@arg PuzzleWithVert a puzzle with initialized vertical slots
@@ -110,7 +115,7 @@ create_vert(Puzzle, PuzzleWithVert) :-
 	create_slots(PuzzleT, vert_slot_ctor, PuzzleWithVertT),
 	puzzle_transpose(PuzzleWithVertT, PuzzleWithVert).
 
-%!	vert_slot_ctor(+PTile, +VertPTiles, -PTileWithVertSlot)
+%!	vert_slot_ctor(+PTile, +VertPTiles, -PTileWithVertSlot).
 %
 %	@arg PTile ptile which does not contain vertical slot
 %	@arg VertPTiles list of PTiles which make up the vertical slot
@@ -134,7 +139,7 @@ vert_slot_ctor(
 		Slot = nil
 	).
 
-%!	create_slots(+Puzzle, +SlotCtor, -PuzzleWithSlot)
+%!	create_slots(+Puzzle, +SlotCtor, -PuzzleWithSlot).
 %
 %	@arg Puzzle a puzzle whose slot will be initialized
 %	@arg SlotCtor a predicate which sets the slot in PTile
@@ -150,7 +155,7 @@ create_slots([PRow | PRows], SlotCtor, [PRowWithSlots | PRowsWithSlots]) :-
 	create_slot(PRow, SlotCtor, [], PRowWithSlots),
 	create_slots(PRows, SlotCtor, PRowsWithSlots).
 
-%!	create_slot(+PRow, +SlotCtor, Before, -PRowWithSlot)
+%!	create_slot(+PRow, +SlotCtor, Before, -PRowWithSlot).
 %
 %	@arg PRow a row of a puzzle whose slot will be initialized
 %	@arg SlotCtor a predicate which sets the slot in PTile
@@ -185,7 +190,7 @@ create_slot(
 	),
 	create_slot(PTiles, SlotCtor, WithMe, PTilesWithSlot).
 
-%!	create_slot_find_rest(+RestOfRow, -RestOfSlot)
+%!	create_slot_find_rest(+RestOfRow, -RestOfSlot).
 %
 %	@arg RestOfRow the rest of currently processed row
 %	@arg RestOfSlot Identified rest of the current slot
@@ -204,7 +209,7 @@ create_slot_find_rest([PTile | PTiles], Result) :-
 		append([PTile], Rest, Result)
 	).
 
-%!	create_words(Puzzle, Wordlist, PuzzleWithWords)
+%!	create_words(Puzzle, Wordlist, PuzzleWithWords).
 %
 %	@arg Puzzle puzzle with slots but without lists of possible words
 %	@arg Wordlist list of all words without duplicates
@@ -216,7 +221,7 @@ create_slot_find_rest([PTile | PTiles], Result) :-
 create_words(Puzzle, Wordlist, PuzzleWithWords) :-
 	 puzzle_map(Puzzle, create_words_func(Wordlist), PuzzleWithWords).
 
-%!	create_words_func(Wordlist, PTile, PTileWithWords)
+%!	create_words_func(Wordlist, PTile, PTileWithWords).
 %
 %	@arg Wordlist list of all words without duplicates
 %	@arg PTile a PTile without assigned list of possible words
@@ -231,7 +236,7 @@ create_words_func(
 	create_words_slot(Tile, Wordlist, Horiz, HorizWithWords),
 	create_words_slot(Tile, Wordlist, Vert, VertWithWords).
 
-%!	create_words_slot(Tile, Wordlist, Slot, SlotWithWords)
+%!	create_words_slot(Tile, Wordlist, Slot, SlotWithWords).
 %
 %	@arg Tile the Tile of current PTile
 %	@arg Wordlist list of all words without duplicates

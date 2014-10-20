@@ -1,7 +1,14 @@
+/**	<file> Filling Puzzle Solver
+
+	This program solves fillin puzzles.
+	
+	@author Adam Juraszek <juriad@gmail.com>
+*/
+
 :- use_module(fillin_io).
 :- use_module(fillin_cp).
 
-%!	main(+TemplateFile, +WordlistFile, +SolutionFile)
+%!	main(+TemplateFile, +WordlistFile, +SolutionFile).
 %
 %	@arg TemplateFile file containing the template of the puzzle
 %	@arg WordlistFile file containing list of words to fill in

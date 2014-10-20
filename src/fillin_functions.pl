@@ -1,4 +1,9 @@
-%!	This contains a few higher-order functions and a custom transposition.
+/**	<module> Higher-order Functions
+
+	This contains a few higher-order functions and a custom transposition.
+	
+	@author Adam Juraszek <juriad@gmail.com>
+*/
 :- module(fillin_functions, [
 		puzzle_map_fold/5, 
 		puzzle_map/3, 
@@ -12,7 +17,7 @@
 :- meta_predicate puzzle_fold(?, 3, ?, ?).
 :- meta_predicate puzzle_map_fold(?, 4, ?, ?, ?).
 
-%!	puzzle_map(+Puzzle, +Func, -MappedPuzzle)
+%!	puzzle_map(+Puzzle, +Func, -MappedPuzzle).
 %
 %	@arg Puzzle Puzzle whose PTiles will be mapped
 %	@arg Func predicate to be applied to all PTiles
@@ -28,7 +33,7 @@ puzzle_map([PRow | PRows], Func, [MappedPRow | MappedPRows]) :-
 	puzzle_map_tiles(PRow, Func, MappedPRow),
 	puzzle_map(PRows, Func, MappedPRows).
 
-%!	puzzle_map_tiles(+PRow, +Func, -MappedPRow)
+%!	puzzle_map_tiles(+PRow, +Func, -MappedPRow).
 %
 %	@arg PRow PRow whose PTiles will be mapped
 %	@arg Func predicate to be applied to all PTiles
@@ -44,7 +49,7 @@ puzzle_map_tiles([PTile | PTiles], Func, [MappedPTile | MappedPTiles]) :-
 	call(Func, PTile, MappedPTile),
 	puzzle_map_tiles(PTiles, Func, MappedPTiles).
 
-%!	puzzle_fold(+Puzzle, +Func, +Start, -Result)
+%!	puzzle_fold(+Puzzle, +Func, +Start, -Result).
 %
 %	@arg Puzzle Puzzle whose PTiles will be folded
 %	@arg Func predicate to be applied to all PTiles and intermediate result
@@ -63,7 +68,7 @@ puzzle_fold([PRow | PRows], Func, Start, Result) :-
 	puzzle_fold_tiles(PRow, Func, Start, Start2),
 	puzzle_fold(PRows, Func, Start2, Result).
 
-%!	puzzle_fold_tiles(+PRow, +Func, +Start, -Result)
+%!	puzzle_fold_tiles(+PRow, +Func, +Start, -Result).
 %
 %	@arg PRow PRow whose PTiles will be mapped
 %	@arg Func predicate to be applied to all PTiles
@@ -81,7 +86,7 @@ puzzle_fold_tiles([PTile | PTiles], Func, Start, Result) :-
 	call(Func, PTile, Start, Start2),
 	puzzle_fold_tiles(PTiles, Func, Start2, Result).
 	
-%!	puzzle_map_fold(+Puzzle, +Func, +Start, -MappedPuzzle, -Result)
+%!	puzzle_map_fold(+Puzzle, +Func, +Start, -MappedPuzzle, -Result).
 %
 %	@arg Puzzle Puzzle whose PTiles will be mapped and folded
 %	@arg Func predicate to be applied to all PTiles
@@ -103,7 +108,7 @@ puzzle_map_fold(
 	puzzle_map_fold_tiles(PRow, Func, Start, MappedPRow, Start2),
 	puzzle_map_fold(PRows, Func, Start2, MappedPRows, Result).
 
-%!	puzzle_map_fold_tiles(+PRow, +Func, +Start, -MappedPRow, -Result)
+%!	puzzle_map_fold_tiles(+PRow, +Func, +Start, -MappedPRow, -Result).
 %
 %	@arg PRow PRow whose PTiles will be mapped
 %	@arg Func predicate to be applied to all PTiles
@@ -126,39 +131,40 @@ puzzle_map_fold_tiles(
 	call(Func, PTile, Start, MappedPTile, Start2),
 	puzzle_map_fold_tiles(PTiles, Func, Start2, MappedPTiles, Result).
 
-%!	puzzle_transpose(+Puzzle, -PuzzleT)
+%!	puzzle_transpose(+Puzzle, -PuzzleT).
 %
 %	@arg Puzzle Puzzle to transpose
 %	@arg PuzzleT transposed Puzzle
-%	TODO tail recursion
 %
 %	Transposes the Puzzle.
 %	
-%	It iterates over rows and prepends each element to a list of columns.
-%	The last row is converted to list of singleton lists.
+%	If the puzzle is empty, it is already transposed.
+%	Otherwise it takes the first row and converts it into the first column.
+%	This column is a base of the transposed puzzle.
+%	Then the tail-recursive version with an accumulator is called.
 puzzle_transpose([], []).
 puzzle_transpose([Row | Rows], PuzzleT) :-
-	(
-		Rows = []
-	->
-		list_to_singletons(Row, PuzzleT)
-	;
-		puzzle_transpose(Rows, Rest),
-		prepend_to_lists(Row, Rest, PuzzleT)
-	).
+	list_to_singletons(Row, PuzzleAccumulator),
+	puzzle_transpose(Rows, PuzzleAccumulator, PuzzleT).
 
-%!	prepend_to_lists(+Elements, +Lists, -ListsWithElements)
+%!	puzzle_transpose(+Puzzle, +PuzzleAccumulator, -PuzzleT).
 %
-%	@arg Elements list of elements to prepend by one to list of lists
-%	@arg Lists list of lists of the same size as Elements
-%	@arg ListsWithElements list of lists with prepended Elements
+%	@arg Puzzle Puzzle to transpose
+%	@arg PuzzleAccumulator accumulator of all converted columns so far
+%	@arg PuzzleT transposed Puzzle
 %
-%	Prepends each element to one list.
-prepend_to_lists([], [], []).
-prepend_to_lists([X | Xs], [List | Lists], [[X | List] | Rest]) :-
-	prepend_to_lists(Xs, Lists, Rest).
+%	Transposes the rest of the Puzzle.
+%	It assumes that PuzzleAcumulator contains at least one column.
+%	
+%	If the puzzle is empty, then the content of the accumulator is the result.
+%	Otherwise it iterates over rows
+%	and each row is appended to the accumulator in element by element fashion.
+puzzle_transpose([], PuzzleT, PuzzleT).
+puzzle_transpose([Row | Rows], PuzzleAccumulator, PuzzleT) :-
+	append_to_lists(Row, PuzzleAccumulator, PuzzleAccumulator2),
+	puzzle_transpose(Rows, PuzzleAccumulator2, PuzzleT).
 
-%!	list_to_singletons(+List, -ListsOfSingletons)
+%!	list_to_singletons(+List, -ListsOfSingletons).
 %
 %	@arg List list of elements to be converted
 %	@arg ListsOfSingletons list of lists of size one
@@ -168,3 +174,15 @@ prepend_to_lists([X | Xs], [List | Lists], [[X | List] | Rest]) :-
 list_to_singletons([], []).
 list_to_singletons([X | Xs], [[X] | Rest]) :-
 	list_to_singletons(Xs, Rest).
+
+%!	append_to_lists(+Elements, +Lists, -ListsWithElements).
+%
+%	@arg Elements list of elements to append by one to list of lists
+%	@arg Lists list of lists of the same size as Elements
+%	@arg ListsWithElements list of lists with appended Elements
+%
+%	Appends each element to one list.
+append_to_lists([], [], []).
+append_to_lists([X | Xs], [List | Lists], [ListX | Rest]) :-
+	append(List, [X], ListX),
+	append_to_lists(Xs, Lists, Rest).

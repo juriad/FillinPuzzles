@@ -1,8 +1,13 @@
-%!	Reading and writing of puzzles and related things.
-%	This module exports fucntions which are meant to be used
-%	by the main function of the program.
-%	It provides reading and writing of templates and wordlists,
-%	and writing and converting puzzles.
+/**	<module> Input and Output
+
+	Reading and writing of puzzles and related things.
+	This module exports fucntions which are meant to be used
+	by the main function of the program.
+	It provides reading and writing of templates and wordlists,
+	and writing and converting puzzles.
+	
+	@author Adam Juraszek <juriad@gmail.com>
+*/
 :- module(fillin_io, [
 		read_template/2,
 		read_wordlist/2,
@@ -13,7 +18,7 @@
 
 :- use_module(fillin_functions).
 
-%!	read_template(+Filename, -Template)
+%!	read_template(+Filename, -Template).
 %
 %	@arg Filename file containing the template of the puzzle
 %	@arg Template the template read from the file
@@ -27,7 +32,7 @@
 read_template(Filename, Template) :-
 	read_file(Filename, Template).
 
-%!	read_wordlist(+Filename, -Wordlist)
+%!	read_wordlist(+Filename, -Wordlist).
 %
 %	@arg Filename file containing the list of words used in the puzzle
 %	@arg Wordlist the list of words read from file
@@ -40,7 +45,7 @@ read_template(Filename, Template) :-
 read_wordlist(Filename, Wordlist) :-
 	read_file(Filename, Wordlist).
 
-%!	read_file(+Filename, -Content)
+%!	read_file(+Filename, -Content).
 %
 %	@arg Filename file containing list of lines
 %	@arg Content the file as list of lines
@@ -53,7 +58,7 @@ read_file(Filename, Content) :-
 	read_lines(Stream, Content),
 	close(Stream).
 
-%!	read_lines(+Stream, -Content)
+%!	read_lines(+Stream, -Content).
 %
 %	@arg Stream file handle opened for reading
 %	@arg Content content of the file until the end
@@ -78,7 +83,7 @@ read_lines(Stream, Content) :-
 		read_lines(Stream, Content1)
 	).
 
-%!	read_lines(+Stream, -Line, -Last)
+%!	read_lines(+Stream, -Line, -Last).
 %
 %	@arg Stream file handle opened for reading
 %	@arg Line a single line read from the file
@@ -106,7 +111,7 @@ read_line(Stream, Line, Last) :-
 		)
 	).
 
-%!	write_puzzle(+Filename, +Puzzle)
+%!	write_puzzle(+Filename, +Puzzle).
 %
 %	@arg Filename file where the puzzle will be written
 %	@arg Puzzle puzzle to write to the file
@@ -117,7 +122,7 @@ write_puzzle(Filename, Puzzle) :-
 	puzzle_to_template(Puzzle, Template),
 	write_file(Filename, Template).
 
-%!	puzzle_to_template(+Puzzle, -Template)
+%!	puzzle_to_template(+Puzzle, -Template).
 %
 %	@arg Puzzle puzzle to convert
 %	@arg Template converted puzzle in forma of a template
@@ -127,7 +132,7 @@ write_puzzle(Filename, Puzzle) :-
 puzzle_to_template(Puzzle, Template) :-
 	puzzle_map(Puzzle, puzzle_to_template_func, Template).
 
-%!	puzzle_to_template_func(+PTile, -TTile)
+%!	puzzle_to_template_func(+PTile, -TTile).
 %
 %	@arg PTile tile of a puzzle
 %	@arg TTile tile of a template
@@ -143,7 +148,7 @@ puzzle_to_template_func(tile(_, Tile, _, _, _), TTile) :-
 		TTile = Tile
 	).
 
-%!	write_template(+Filename, +Template)
+%!	write_template(+Filename, +Template).
 %
 %	@arg Filename file where to write the template
 %	@arg Template the template to be written to the file
@@ -152,7 +157,7 @@ puzzle_to_template_func(tile(_, Tile, _, _, _), TTile) :-
 write_template(Filename, Template) :-
 	write_file(Filename, Template).
 
-%!	write_wordlist(+Filename, +Wordlist)
+%!	write_wordlist(+Filename, +Wordlist).
 %
 %	@arg Filename file where to write the wordlist
 %	@arg Wordlist the wordlist to be written to the file
@@ -161,7 +166,7 @@ write_template(Filename, Template) :-
 write_wordlist(Filename, Wordlist) :-
 	write_file(Filename, Wordlist).
 
-%!	write_file(+Filename, +Content)
+%!	write_file(+Filename, +Content).
 %
 %	@arg Filename file where to write the content
 %	@arg Content list of lists of chars
@@ -170,10 +175,10 @@ write_wordlist(Filename, Wordlist) :-
 %	If such file already exists, it will be overwritten. 
 write_file(Filename, Content) :-
 	open(Filename, write, Stream),
-	write_line(Stream, Content),
+	write_lines(Stream, Content),
 	close(Stream).
 
-%!	write_lines(+Stream, +Lines)
+%!	write_lines(+Stream, +Lines).
 %
 %	@arg Stream handle of a file opened for writing
 %	@arg Content list of lists of chars
@@ -186,7 +191,7 @@ write_lines(Stream, [Line | Lines]) :-
 	nl(Stream),
 	write_lines(Stream, Lines).
 
-%!	write_line(+Stream, +Line)
+%!	write_line(+Stream, +Line).
 %
 %	@arg Stream handle of a file opened for writing
 %	@arg Line list of chars

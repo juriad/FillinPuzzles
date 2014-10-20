@@ -1,12 +1,17 @@
-%!	Provides a queue which respects element order and uniqueness.
-%	The elements of the queue are numeral Ids of PTiles.
+/**	<module> Constraint Solver Queue
+
+	Provides a queue which respects element order and uniqueness.
+	The elements of the queue are numeral Ids of PTiles.
+	
+	@author Adam Juraszek <juriad@gmail.com>
+*/
 :- module(fillin_queue, [
 		enqueue_all/2, 
 		enqueue/3]).
 
 :- use_module(fillin_filter).
 
-%!	enqueue_all(+Puzzle, -Queue)
+%!	enqueue_all(+Puzzle, -Queue).
 %
 %	@arg Puzzle a puzzle
 %	@arg Queue a queue contining all Ids of the Puzzle
@@ -15,7 +20,7 @@
 enqueue_all(Puzzle, Queue) :-
 	enqueue_all(Puzzle, [], Queue).
 
-%!	enqueue_all(+Puzzle, -Before, -Queue)
+%!	enqueue_all(+Puzzle, -Before, -Queue).
 %
 %	@arg Puzzle a puzzle
 %	@arg Before an accumulator of the Queue
@@ -28,7 +33,7 @@ enqueue_all([PRow | PRows], Before, Queue) :-
 	append(Before, Ids, Queue2),
 	enqueue_all(PRows, Queue2, Queue).
 
-%!	enqueue(+Queue, +Ids, -QueueWithIds)
+%!	enqueue(+Queue, +Ids, -QueueWithIds).
 %
 %	@arg Queue a queue of numbers
 %	@arg Ids a list of numbers

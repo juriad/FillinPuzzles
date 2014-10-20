@@ -1,12 +1,17 @@
-%!	Propagation stuff which basically filters out all options
-%	which are not possible from various reasons.
+/**	<module> Constraint Solver Propagation
+
+	Propagation stuff which basically filters out all options
+	which are not possible from various reasons.
+	
+	@author Adam Juraszek <juriad@gmail.com>
+*/
 :- module(fillin_propagation, [propagate/4]).
 
 :- use_module(fillin_filter).
 :- use_module(fillin_functions).
 :- use_module(fillin_queue).
 
-%!	propagate(+Puzzle, +Wordlist, Queue, FilteredPuzzle)
+%!	propagate(+Puzzle, +Wordlist, Queue, FilteredPuzzle).
 %
 %	@arg Puzzle Puzzle to propagate
 %	@arg Wordlist list of all possible words including possible duplicities
@@ -79,7 +84,7 @@ propagate(Puzzle, Wordlist, [Id | Queue], PropagatedPuzzle) :-
 	puzzle_map_fold(Puzzle, propagate_func(Id), Queue, Puzzle1, Queue2),
 	propagate(Puzzle1, Wordlist, Queue2, PropagatedPuzzle).
 	
-%	propagate_global_words(+Puzzle, +Wordlist, -PropagatedPuzzle)
+%	propagate_global_words(+Puzzle, +Wordlist, -PropagatedPuzzle).
 %
 %	@arg Puzzle Puzzle to be propagaed using global words propagator
 %	@arg Wordlist list of all possible Words including duplicities
@@ -112,7 +117,7 @@ propagate_global_words(Puzzle, Wordlist, PropagatedPuzzle) :-
 		propagate(FilteredPuzzle, Wordlist, Queue, PropagatedPuzzle)
 	).
 
-%!	gather_words(+Puzzle, -AssignedWords)
+%!	gather_words(+Puzzle, -AssignedWords).
 %
 %	@arg Puzzle Puzzle to be searched for assigned words
 %	@arg AssignedWords list of words which are assigned to a Slot in Puzzle
@@ -124,7 +129,7 @@ propagate_global_words(Puzzle, Wordlist, PropagatedPuzzle) :-
 gather_words(Puzzle, AssignedWords) :-
 	puzzle_fold(Puzzle, gather_words_func, [], AssignedWords).
 
-%!	gather_words_func(+PTile, -AssignedWords)
+%!	gather_words_func(+PTile, -AssignedWords).
 %
 %	@arg PTile PTile to be searched for assigned words
 %	@arg Accumulator a list of words found so far
@@ -137,7 +142,7 @@ gather_words_func(tile(Id, _, Horiz, Vert, _), Accumulator, AssignedWords) :-
 	add_word(Id, Horiz, Accumulator, Result1),
 	add_word(Id, Vert, Result1, AssignedWords).
 
-%!	add_word(+Id, +Slot, +Accumulator, -Result)
+%!	add_word(+Id, +Slot, +Accumulator, -Result).
 %
 %	@arg Id Id of the PTile which is currently being procesed
 %	@arg Slot Slot of the PTile which is currently being procesed
@@ -160,19 +165,18 @@ add_word(Id, slot(Ids, _, Words), Accumulator, Result) :-
 		Result = Accumulator
 	).
 
-%!	subtract_list(+All, +Some, -Rest)
+%!	subtract_list(+All, +Some, -Rest).
 %
 %	@arg All list of all elements
 %	@arg Some list of some of the elements of All
 %	@arg Rest elements of All without Some
-%	TODO unify only one clause
 %
 %	All the lists must be sorted.
 %	All the lists may contain duplicities.
 %	Some must contain at most that number of copies of an element
 %	which is equal to number of occurences in All.
 %	Otherwise the predicated is forced to fail.
-subtract_list(All, [], All).
+subtract_list(All, [], All) :- !. % green cut
 subtract_list([A | As], Some, Rest) :-
 	Some = [S | Ss],
 	compare(Cmp, A, S),
@@ -191,7 +195,7 @@ subtract_list([A | As], Some, Rest) :-
 		)
 	).
 
-%!	propagate_allowed_words(+Puzzle, +AllowedWords, -PropagatedPuzzle, -Queue)
+%!	propagate_allowed_words(+Puzzle, +AllowedWords, -PropagatedPuzzle, -Queue).
 %
 %	@arg Puzzle the Puzzle to apply the propagation to
 %	@arg AllowedWords list of all allowed words to assign
@@ -213,7 +217,7 @@ propagate_allowed_words(Puzzle, AllowedWords, PropagatedPuzzle, Queue) :-
 %!			+PTile,
 %!			+Queue,
 %!			-PropagatedPTile,
-%!			-ModifiedQueue)
+%!			-ModifiedQueue).
 %
 %	@arg AllowedWords list of all allowed words to assign
 %	@arg PTile the PTile to apply the propagation to
@@ -250,8 +254,7 @@ propagate_allowed_words_func(
 %!			+PTile,
 %!			+Queue,
 %!			-PropagatedPTile,
-%!			-ModifiedQueue)
-%	TODO unify only one clause
+%!			-ModifiedQueue).
 %
 %	@arg PTile the PTile to apply the propagation to
 %	@arg Slot the PTile's Slot ot apply the propagation to
@@ -264,7 +267,7 @@ propagate_allowed_words_func(
 %	Otherwise, the list of possible words is filtered
 %	and only those which are in both lists are kept.
 %	If the Slot changed, Ids of its other PTiles are enqueued. 
-propagate_allowed_words_slot(_, nil, _, Queue, nil, Queue).
+propagate_allowed_words_slot(_, nil, _, Queue, nil, Queue) :- !. % green cut
 propagate_allowed_words_slot(
 		PTile, 
 		Slot, 
@@ -289,7 +292,7 @@ propagate_allowed_words_slot(
 		ModifiedQueue = Queue
 	).
 
-%!	propagate_func(+Id, +PTile, +Queue, -PropagatedPTile, -ModifiedQueue)
+%!	propagate_func(+Id, +PTile, +Queue, -PropagatedPTile, -ModifiedQueue).
 %
 %	@arg Id id of the PTile which should be propagated
 %	@arg PTile current PTile which may or may not be propagated
@@ -310,7 +313,7 @@ propagate_func(Id, PTile, Queue, PropagatedPTile, ModifiedQueue) :-
 		ModifiedQueue = Queue
 	).
 
-%!	propagate_tile(+PTile, +Queue, -PropagatedPTile, -ModifiedQueue)
+%!	propagate_tile(+PTile, +Queue, -PropagatedPTile, -ModifiedQueue).
 %
 %	@arg PTile PTile which will be propagated
 %	@arg Queue old queue of Ids to be processed
@@ -352,8 +355,7 @@ propagate_tile(
 %!			+Queue,
 %!			-PropagatedSlot,
 %!			-ModifiedQueue,
-%!			-PropagatedLetters)
-%	TODO only one clause should unify
+%!			-PropagatedLetters).
 %
 %	@arg PTile PTile which will be propagated
 %	@arg Slot Slot of the PTile to be propagated
@@ -365,7 +367,7 @@ propagate_tile(
 %	The propagator filters out all words which don't unify with the Slot.
 %	It also gathers set of all letters which could be assigned to Tile.
 %	After the filtering, new Ids may have been enqueued.
-propagate_words(_, nil, Queue, nil, Queue, nil).
+propagate_words(_, nil, Queue, nil, Queue, nil) :- !. % green cut
 propagate_words(
 		PTile,
 		Slot, 
@@ -378,7 +380,7 @@ propagate_words(
 	filter_words(Tiles, Tile, Words, PropagatedWords, PropagatedLetters),
 	propagate_handle_queue(PTile, Slot, PropagatedWords, Queue, ModifiedQueue).
 
-%!	mergeLetters(+L1, +L2, -L)
+%!	mergeLetters(+L1, +L2, -L).
 %
 %	@arg L1 first list or nil
 %	@arg L2 second list of nil
@@ -414,8 +416,7 @@ merge_letters(L1, L2, L) :-
 %!			+AllowedLetters,
 %!			+Queue,
 %!			-PropagatedSlot,
-%!			-ModifiedQueue)
-%	TODO only one clause should unify
+%!			-ModifiedQueue).
 %
 %	@arg PTile PTile which will be propagated
 %	@arg Slot Slot of the PTile to be propagated
@@ -427,7 +428,7 @@ merge_letters(L1, L2, L) :-
 %	The propagator filters out all words which unifies with the Slot
 %	but doing so assignes a different letter to Tile than is allowed.
 %	After the filtering, new Ids may have been enqueued.
-propagate_letters(_, nil, _, Queue, nil, Queue).
+propagate_letters(_, nil, _, Queue, nil, Queue) :- !.% green cut
 propagate_letters(
 		PTile,
 		Slot, 
@@ -450,7 +451,7 @@ propagate_letters(
 %!			+Slot, 
 %!			+PropagatedWords, 
 %!			+Queue, 
-%!			-ModifiedQueue)
+%!			-ModifiedQueue).
 %
 %	@arg PTile PTile being propagated
 %	@arg Slot Slot being propagated

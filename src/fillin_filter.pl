@@ -1,5 +1,10 @@
-%!	Various filtering functions which are used either for conversion
-%	or limiting number of possibilities.
+/**	<module> Filtering Tools
+
+	Various filtering functions which are used either for conversion
+	or limiting number of possibilities.
+	
+	@author Adam Juraszek <juriad@gmail.com>
+*/
 :- module(fillin_filter, [
 		filter_tiles/2, 
 		filter_ids/2, 
@@ -7,7 +12,7 @@
 		filter_words_by_letters/5, 
 		filter_listed_words/3]).
 
-%!	filter_tiles(+PTiles, -Tiles)
+%!	filter_tiles(+PTiles, -Tiles).
 %
 %	@arg PTiles list of PTiles
 %	@arg Tiles list of Tiles
@@ -18,7 +23,7 @@ filter_tiles([], []).
 filter_tiles([tile(_, Tile, _, _, _) | PTiles], [Tile | Rest]) :-
 	filter_tiles(PTiles, Rest).
 
-%!	filter_tiles(+PTiles, -Ids)
+%!	filter_tiles(+PTiles, -Ids).
 %
 %	@arg PTiles list of PTiles
 %	@arg Ids list of Ids
@@ -29,14 +34,13 @@ filter_ids([], []).
 filter_ids([tile(Id, _, _, _, _) | PTiles], [Id | Rest]) :-
 	filter_ids(PTiles, Rest).
 
-%!	filter_words(+Tiles, +Tile, +Words, -FilteredWords, -Letters)
+%!	filter_words(+Tiles, +Tile, +Words, -FilteredWords, -Letters).
 %
 %	@arg Tiles list of Tiles is slot which is being processed
 %	@arg Tile the current tile in the list of Tiles
 %	@arg Words old list of all possible words
 %	@arg FilteredWords new list of all possible words
 %	@arg Letters set of letters which could be assigned to Tile
-%	TODO tail recursion
 %
 %	Filters out all words which cannot be assigned to Tiles
 %	by trying to unify them.
@@ -45,13 +49,50 @@ filter_ids([tile(Id, _, _, _, _) | PTiles], [Id | Rest]) :-
 %
 %	It also gathers set of all letters at the Tile position
 %	which could be assigned by filling Tiles with words from FilteredWords.
+%
+%	This predicate just calls its tail-recursive version.
 filter_words(_, _, [], [], []).
-filter_words(Tiles, Tile, [Word | Words], FilteredWords, Letters) :-
-	filter_words(Tiles, Tile, Words, Rest, RestLetters),
+filter_words(Tiles, Tile, Words, FilteredWords, Letters) :-
+	filter_words(Tiles, Tile, Words, [], FilteredWordsR, [], Letters),
+	reverse(FilteredWordsR, FilteredWords).
+
+%!	filter_words(
+%!			+Tiles, 
+%!			+Tile, 
+%!			+Words, 
+%!			+WordsAccumulator, 
+%!			-FilteredWords, 
+%!			+LettersAccumulator, 
+%!			-Letters).
+%
+%	@arg Tiles list of Tiles is slot which is being processed
+%	@arg Tile the current tile in the list of Tiles
+%	@arg Words old list of all possible words
+%	@arg WordsAccumulator filtered words so far
+%	@arg FilteredWords new list of all possible words
+%	@arg LettersAccumulator gathered letters so far
+%	@arg Letters set of letters which could be assigned to Tile
+%
+%	Filters out all words which cannot be assigned to Tiles
+%	by trying to unify them.
+%	Failure may happen when the sizes are different
+%	or when some Tiles are already filled in.
+%
+%	It also gathers set of all letters at the Tile position
+%	which could be assigned by filling Tiles with words from FilteredWords.
+filter_words(_, _, [], FilteredWords, FilteredWords, Letters, Letters).
+filter_words(
+		Tiles, 
+		Tile, 
+		[Word | Words], 
+		WordsAccumulator, 
+		FilteredWords,
+		LettersAccumulator, 
+		Letters) :-
 	(
 		unifiable(Word, Tiles, Subst)
 	->
-		FilteredWords = [Word | Rest],
+		WordsAccumulator2 = [Word | WordsAccumulator],
 		(
 			var(Tile)
 		->
@@ -59,46 +100,90 @@ filter_words(Tiles, Tile, [Word | Words], FilteredWords, Letters) :-
 		;
 			Letter = Tile
 		),
-		union([Letter], RestLetters, Letters)
+		union([Letter], LettersAccumulator, LettersAccumulator2)
 	;
-		FilteredWords = Rest,
-		Letters = RestLetters
-	).
+		WordsAccumulator2 = WordsAccumulator,
+		LettersAccumulator2 = LettersAccumulator
+	),
+	filter_words(
+			Tiles, 
+			Tile, 
+			Words, 
+			WordsAccumulator2, 
+			FilteredWords, 
+			LettersAccumulator2, 
+			Letters).
 
-%!	filter_words_by_letters(+Tiles, +Tile, +Words, +Letters, -FilteredWords)
+%!	filter_words_by_letters(+Tiles, +Tile, +Words, +Letters, -FilteredWords).
 %
 %	@arg Tiles list of Tiles is slot which is being processed
 %	@arg Tile the current tile in the list of Tiles
 %	@arg Words old list of all possible words
 %	@arg Letters set of letters which could be used in Tile
 %	@arg FilteredWords new list of all possible words
-%	TODO tail recursion
 %
 %	Filters out all words which cannot be assigned to Tiles
 %	by trying to unify them and testing
 %	if their letter at Tile position is one of those in set of Letters.
+%
+%	This predicate just calls its tail-recursive version.
 filter_words_by_letters(_, _, [], _, []).
-filter_words_by_letters(Tiles, Tile, [Word | Words], Letters, FilteredWords) :-
-	filter_words_by_letters(Tiles, Tile, Words, Letters, Rest),
+filter_words_by_letters(Tiles, Tile, Words, Letters, FilteredWords) :-
+	filter_words_by_letters(Tiles, Tile, Words, Letters, [], FilteredWordsR),
+	reverse(FilteredWordsR, FilteredWords).
+
+%!	filter_words_by_letters(
+%!			+Tiles, 
+%!			+Tile, 
+%!			+Words, 
+%!			+Letters, 
+%!			+WordsAccumulator, 
+%!			-FilteredWords).
+%
+%	@arg Tiles list of Tiles is slot which is being processed
+%	@arg Tile the current tile in the list of Tiles
+%	@arg Words old list of all possible words
+%	@arg Letters set of letters which could be used in Tile
+%	@arg WordsAccumulator filtered words so far
+%	@arg FilteredWords new list of all possible words
+%
+%	Filters out all words which cannot be assigned to Tiles
+%	by trying to unify them and testing
+%	if their letter at Tile position is one of those in set of Letters.
+filter_words_by_letters(_, _, [], _, FilteredWords, FilteredWords).
+filter_words_by_letters(
+		Tiles, 
+		Tile, 
+		[Word | Words], 
+		Letters, 
+		WordsAccumulator, 
+		FilteredWords) :-
 	(
 		unifiable(Word, Tiles, Subst),
 		(
 			var(Tile)
 		->
-			find_val(Tile, Subst, Letter),
+			find_val(Subst, Tile, Letter),
 			member(Letter, Letters)
 		;
 			true
 		)
 	->
-		FilteredWords = [Word | Rest]
+		WordsAccumulator2 = [Word | WordsAccumulator]
 	;
-		FilteredWords = Rest
-	).
+		WordsAccumulator2 = WordsAccumulator
+	),
+	filter_words_by_letters(
+			Tiles, 
+			Tile, 
+			Words, 
+			Letters, 
+			WordsAccumulator2, 
+			FilteredWords).
 
 
-%!	find_val(+Var, +Substitutions, -Val)
-%!	find_val(+Var, +Substitutions, +Val)
+%!	find_val(+Var, +Substitutions, -Val).
+%!	find_val(+Var, +Substitutions, +Val).
 %
 %	@arg Substitutions list of Var=Val pairs
 %	@arg Var left side of pair to search for
@@ -115,7 +200,7 @@ find_val([(X=Y) | Xs], Var, Val) :-
 		find_val(Xs, Var, Val)
 	).
 
-%!	filter_listed_words(+Words, +ListedWords, -FilteredWords)
+%!	filter_listed_words(+Words, +ListedWords, -FilteredWords).
 %
 %	@arg Words old list of words
 %	@arg ListedWords list of allowed words

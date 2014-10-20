@@ -1,5 +1,10 @@
-%!	Hides the complexity of constarint solver.
-%	Exports only one predicate which solves the puzzle.
+/**	<module> Constraint Solver
+ 
+	Hides the complexity of constarint solver.
+	Exports only one predicate which solves the puzzle.
+	
+	@author Adam Juraszek <juriad@gmail.com>
+*/
 :- module(fillin_cp,[solve_puzzle/3]).
 
 :- use_module(fillin_init).
@@ -7,7 +12,7 @@
 :- use_module(fillin_search).
 :- use_module(fillin_queue).
 
-%!	solve_puzzle(+Template, +Wordlist, -Solution)
+%!	solve_puzzle(+Template, +Wordlist, -Solution).
 %
 %	arg Template template of a puzzle to be solved
 %	arg Wordlist list of words to be filled in in the puzzle

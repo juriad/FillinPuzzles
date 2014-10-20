@@ -1,12 +1,16 @@
-%!	Contains the search predicate which does all the hard work.
-%	This is also the only place where decisions are made.
+/**	<module> Constraint Solver Search
+
+	Contains the search predicate which does all the hard work.
+	This is also the only place where decisions are made.
+	
+	@author Adam Juraszek <juriad@gmail.com>
+*/
 :- module(fillin_search, [search/3]).
 
 :- use_module(fillin_propagation).
 :- use_module(fillin_functions).
 
-
-%!	search(+Puzzle, +Wordlist, -Solution)
+%!	search(+Puzzle, +Wordlist, -Solution).
 %
 %	@arg Puzzle a puzzle to fill
 %	@arg Wodlist list of words to fill into the Puzzle
@@ -31,7 +35,7 @@ search(Puzzle, Wordlist, Solution) :-
 		Solution = Puzzle
 	).
 
-%!	find_best(+Puzzle, -PTile)
+%!	find_best(+Puzzle, -PTile).
 %
 %	@arg Puzzle a puzzle to look through
 %	@arg PTile the best candidate or nil
@@ -51,7 +55,7 @@ search(Puzzle, Wordlist, Solution) :-
 find_best(Puzzle, PTile) :-
 	puzzle_fold(Puzzle, find_best_func, nil, PTile).
 
-%!	find_best_func(+PTile1, +PTile2, -PTile)
+%!	find_best_func(+PTile1, +PTile2, -PTile).
 %
 %	@arg PTile1 first
 %	@arg PTile2 second
@@ -86,7 +90,7 @@ find_best_func(PTile1, PTile2, PTile) :-
 		)
 	).
 
-%!	compare_tiles(+PTile1, +PTile2, -PTile)
+%!	compare_tiles(+PTile1, +PTile2, -PTile).
 %
 %	@arg PTile1 first
 %	@arg PTile2 second
@@ -107,7 +111,7 @@ compare_tiles(PTile1, PTile2, PTile) :-
 		PTile = PTile2
 	).
 
-%!	rate_tile(+PTile, -Rating)
+%!	rate_tile(+PTile, -Rating).
 %
 %	@arg PTile PTile to be rated
 %	@arg Rating rating
@@ -116,7 +120,7 @@ compare_tiles(PTile1, PTile2, PTile) :-
 rate_tile(tile(_, _, _, _, Letters), Rating) :-
 	length(Letters, Rating).
 
-%!	set_value(+PTile)
+%!	set_value(+PTile).
 %
 %	@arg PTile PTile which value will be set
 %
